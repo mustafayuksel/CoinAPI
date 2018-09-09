@@ -7,6 +7,7 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+let mongoose = require('mongoose');
 
 var app = express();
 
@@ -22,6 +23,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+
+// Mongoose
+mongoose.connect("mongodb://localhost:27017/coinAPI", {
+    "useNewUrlParser": true,
+    "socketTimeoutMS": 0,
+    "keepAlive": true,
+    "reconnectTries": 10
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
