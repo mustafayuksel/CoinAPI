@@ -9,6 +9,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 let mongoose = require('mongoose');
 let bodyParser = require('body-parser');
+var Request = require("request");
 
 var app = express();
 
@@ -49,6 +50,16 @@ app.get("/coins", (req, res) => {
   Coins.find({}, {"name" : true, "_id": false}, (err, coins) => {
       res.status(200).send(coins.map(coin => coin.name));
   });
+});
+
+app.get("coins/btcturk", (req, res) => {
+    res.set("Content-Type", "application/json");
+    Request.get("https://www.btcturk.com/api/ticker/", (error, response, body) => {
+        if(error) {
+            return console.dir(error);
+        }
+        res.status(200).send(JSON.parse(body));
+    });
 });
 
 // catch 404 and forward to error handler
