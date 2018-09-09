@@ -8,6 +8,7 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 let mongoose = require('mongoose');
+let bodyParser = require('body-parser');
 
 var app = express();
 
@@ -23,13 +24,31 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use(bodyParser.json());
+app.use(logger('dev'));
 
 // Mongoose
-mongoose.connect("mongodb://localhost:27017/coinAPI", {
+mongoose.connect("mongodb://localhost:27017/coinapi", {
     "useNewUrlParser": true,
     "socketTimeoutMS": 0,
     "keepAlive": true,
     "reconnectTries": 10
+});
+
+var coinSchema = new mongoose.Schema({
+    "_id": {
+        type: mongoose.Schema.Types.ObjectId,
+        required: false
+    }, "name": String
+});
+
+let Coins = mongoose.model("coins", coinSchema);
+
+app.get("/coins", (req, res) => {
+  res.set("Content-Type", "application/json");
+  Coins.find({}, {"name" : true, "_id": false}, (err, coins) => {
+      res.status(200).send(coins.map(coin => coin.name));
+  });
 });
 
 // catch 404 and forward to error handler
